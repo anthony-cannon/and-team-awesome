@@ -3,6 +3,7 @@
 require('dotenv').config();
 const { App } = require('@slack/bolt');
 const requestHandler = require('./Handlers/requestHandler');
+const userStore = require('./userStore/userStore');
 
 
 const app = new App({
@@ -16,6 +17,10 @@ const app = new App({
 
   console.log('⚡️ Bolt app is running!');
 })();
+
+userStore.fetchAllUsersFromWorkspace().then(() => {
+  console.log(userStore.getUserList());
+});
 
 // /setthreshold office1 12
 // /getthreshold office1
