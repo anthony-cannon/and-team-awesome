@@ -4,6 +4,7 @@ require('dotenv').config();
 const { App } = require('@slack/bolt');
 const requestHandler = require('./Handlers/requestHandler');
 const userStore = require('./userStore/userStore');
+const requestProvider = require('./providers/requestProvider');
 
 
 const app = new App({
@@ -19,7 +20,9 @@ const app = new App({
 })();
 
 userStore.fetchAllUsersFromWorkspace().then(() => {
-  console.log(userStore.getUserList());
+  const users = userStore.getUserList();
+  requestProvider.sendInitialRequestToAllEmployees(users);
+  console.log('Sent request to all employees!');
 });
 
 // /setthreshold office1 12
