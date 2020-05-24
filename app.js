@@ -17,11 +17,14 @@ const app = new App({
   await app.start(process.env.PORT || 3000);
 
   console.log('⚡️ Bolt app is running!');
+
+  await requestProvider.deleteInitialRequests();
+  console.log('Finished deleting previous messages');
 })();
 
 userStore.fetchAllUsersFromWorkspace().then(() => {
   const users = userStore.getUserList();
-  requestProvider.sendInitialRequestToAllEmployees(users);
+  // requestProvider.sendInitialRequestToAllEmployees(users);
   console.log('Sent request to all employees!');
 });
 
