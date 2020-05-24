@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 const { App } = require('@slack/bolt');
-const requestHandler = require('./Handlers/requestHandler');
+const commandHandler = require('./Handlers/commandHandler');
 const userStore = require('./userStore/userStore');
 const requestProvider = require('./providers/requestProvider');
 
@@ -29,10 +29,10 @@ userStore.fetchAllUsersFromWorkspace().then(() => {
 // /getthreshold office1
 // /whosattending office1 today,tomorrow,dd/MM/yy
 // /removeme office1 today,tomorrow,dd/MM/yy
-app.command('/setthreshold', requestHandler.handleSetThresholdRequest);
+app.command('/setthreshold', commandHandler.handleSetThresholdRequest);
 
-app.command('/getthreshold', requestHandler.handleGetThresholdRequest);
+app.command('/getthreshold', commandHandler.handleGetThresholdRequest);
 
-app.command('/whosattending', requestHandler.handleGetWhoIsAttendingRequest);
+app.command('/whosattending', commandHandler.handleGetWhoIsAttendingRequest);
 
-app.command('/removeme', requestHandler.handleRemoveMeRequest);
+app.command('/removeme', commandHandler.handleRemoveMeRequest);
