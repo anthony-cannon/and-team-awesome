@@ -2,7 +2,6 @@
 
 require('dotenv').config();
 const { App } = require('@slack/bolt');
-const { createEventAdapter } = require('@slack/events-api');
 const commandHandler = require('./Handlers/commandHandler');
 const userStore = require('./userStore/userStore');
 const requestProvider = require('./providers/requestProvider');
@@ -13,36 +12,22 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
-
 (async () => {
   // Start your app
   await app.start(process.env.PORT || 3000);
-
-  // const server = await slackEvents.start(3000);
 
   console.log('⚡️ Bolt app is running!');
 
   await requestProvider.deleteInitialRequests();
   console.log('Finished deleting previous messages');
+
+  userStore.fetchAllUsersFromWorkspace().then(() => {
+    const users = userStore.getUserList();
+    requestProvider.sendInitialRequestToAllEmployees(users);
+    console.log('Sent request to all employees!');
+  });
 })();
 
-
-userStore.fetchAllUsersFromWorkspace().then(() => {
-  const users = userStore.getUserList();
-  // requestProvider.sendInitialRequestToAllEmployees(users);
-  console.log('Sent request to all employees!');
-});
-
-/*
-slackEvents.on('message', (event) => {
-  console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
-});
-
-slackEvents.on('error', (error) => {
-  console.log(error.name); // TypeError
-});
-*/
 
 // /setthreshold office1 12
 // /getthreshold office1

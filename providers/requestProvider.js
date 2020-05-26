@@ -8,7 +8,7 @@ function sendInitialRequestToAllEmployees(users) {
     webClientProvider.webClient.chat.postMessage({
       channel: user.id,
       text: 'Initial request prompt',
-      blocks: messageBlockProvider.getInitialRequestBlock(`${user.profile.first_name}`),
+      blocks: messageBlockProvider.getInitialRequestBlock(`<@${user.id}>`),
     });
   });
 }
