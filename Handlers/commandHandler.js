@@ -270,7 +270,7 @@ function getAttendeesTotalCount(attendeeMap, office) {
 
 function getSafetyVerdict(count, office) {
   let verdict = 'safe';
-  if (count > officesThreshold.get(office.toLowerCase())) {
+  if (count >= officesThreshold.get(office.toLowerCase())) {
     verdict = 'not safe';
   }
   return verdict;
