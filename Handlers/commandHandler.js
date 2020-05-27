@@ -27,7 +27,7 @@ const handleGetThresholdRequest = async ({ command, ack, say }) => {
   } else if (officeExists) {
     await ack();
     const threshold = getThreshold(office);
-    say(`Threshold for ${params[0].toUpperCase()} is ${threshold}`);
+    say(`*${params[0].toUpperCase()}* seat threshold is ${threshold}`);
   } else {
     await ack('Please enter a valid office name');
   }
@@ -90,15 +90,15 @@ const handleRemoveMeRequest = async ({ command, ack, say }) => {
     const removed = removeAttendeeToday(command.user_id, office, params[1]);
     if (removed) {
       say(
-        `${
-          command.user_name
-        } has been removed from the ${office.toUpperCase()} attendees list today`,
+        `<@${
+          command.user_id
+        }> has been removed from the ${office.toUpperCase()} attendees list today`,
       );
     } else {
       say(
-        `${
-          command.user_name
-        } was not on the list to attend ${office.toUpperCase()} today`,
+        `<@${
+          command.user_id
+        }> was not on the list to attend ${office.toUpperCase()} today`,
       );
     }
   } else if (day.toLowerCase() === 'tomorrow' && officeExists) {
@@ -107,15 +107,15 @@ const handleRemoveMeRequest = async ({ command, ack, say }) => {
     const removed = removeAttendeeTomorrow(command.user_id, office, params[1]);
     if (removed) {
       say(
-        `${
-          command.user_name
-        } has been removed from the the ${office.toUpperCase()} attendees list tomorrow`,
+        `<@${
+          command.user_id
+        }> has been removed from the the ${office.toUpperCase()} attendees list tomorrow`,
       );
     } else {
       say(
-        `${
-          command.user_name
-        } was not on the list to attend ${office.toUpperCase()} tomorrow`,
+        `<@${
+          command.user_id
+        }> was not on the list to attend ${office.toUpperCase()} tomorrow`,
       );
     }
   } else {
@@ -141,15 +141,15 @@ const handleAddMeRequest = async ({ command, ack, say }) => {
     const added = addAttendeeToday(command.user_id, office, params[1]);
     if (added) {
       say(
-        `${
-          command.user_name
-        } added to the ${office.toUpperCase()} attendees list today`,
+        `<@${
+          command.user_id
+        }> added to the ${office.toUpperCase()} attendees list today`,
       );
     } else {
       say(
-        `${
-          command.user_name
-        } is already on the list to attend ${(usersAttendingToday.get(command.user_id)).toUpperCase()} today`,
+        `<@${
+          command.user_id
+        }> is already on the list to attend ${(usersAttendingToday.get(command.user_id)).toUpperCase()} today`,
       );
     }
   } else if (day.toLowerCase() === 'tomorrow' && officeExists) {
@@ -158,15 +158,15 @@ const handleAddMeRequest = async ({ command, ack, say }) => {
     const added = addAttendeeTomorrow(command.user_id, office, params[1]);
     if (added) {
       say(
-        `${
-          command.user_name
-        } added to the the ${office.toUpperCase()} attendees list tomorrow`,
+        `<@${
+          command.user_id
+        }> added to the the ${office.toUpperCase()} attendees list tomorrow`,
       );
     } else {
       say(
-        `${
-          command.user_name
-        } is already on the list to attend ${(usersAttendingTomorrow
+        `<@${
+          command.user_id
+        }> is already on the list to attend ${(usersAttendingTomorrow
           .get(command.user_id))
           .toUpperCase()} tomorrow`,
       );
@@ -190,7 +190,7 @@ const handleSetThresholdRequest = async ({ command, ack, say }) => {
   } else if (params[1].match(isNumber) && officeExists) {
     await ack();
     setThreshold(office, params[1]);
-    say(`Threshold is updated for ${office.toUpperCase()}`);
+    say(`Thanks <@${command.user_id}>. I have set seat threshold for ${office.toUpperCase()} to *${params[1]}*`);
   } else {
     await ack(
       'Ops, make sure your new theshold is a number and the office exists!',

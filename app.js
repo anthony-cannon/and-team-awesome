@@ -23,7 +23,7 @@ const app = new App({
 
   userStore.fetchAllUsersFromWorkspace().then(() => {
     const users = userStore.getUserList();
-    requestProvider.sendInitialRequestToAllEmployees(users);
+    // requestProvider.sendInitialRequestToAllEmployees(users);
     console.log('Sent request to all employees!');
   });
 })();
