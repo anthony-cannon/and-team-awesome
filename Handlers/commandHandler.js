@@ -49,22 +49,26 @@ const handleGetWhoIsAttendingRequest = async ({ command, ack, say }) => {
     params[1] = getTodaysDate();
     await ack();
     const attendees = getAttendeesToday(office, params[1]);
+    const totalCount = getAttendeesTotalCount(usersAttendingToday, office);
+    const verdict = getSafetyVerdict(totalCount, office);
     if (attendees) {
-      say(`${attendees} woud be attending ${office.toUpperCase()} today`);
+      say(`At present ${attendees} would be attending ${office.toUpperCase()} today. \nThis is *${totalCount}* person(s) in total, the office is *${verdict}*.`);
     } else {
       say(
-        `No one at the moment would be attending ${office.toUpperCase()} today`,
+        `At present no one would be attending ${office.toUpperCase()} today, the office is *safe*`,
       );
     }
   } else if (day.toLowerCase() === 'tomorrow' && officeExists) {
     params[1] = getTomorrowsDate();
     await ack();
     const attendees = getAttendeesTomorrow(office, params[1]);
+    const totalCount = getAttendeesTotalCount(usersAttendingTomorrow, office);
+    const verdict = getSafetyVerdict(totalCount, office);
     if (attendees) {
-      say(`${attendees} woud be attending ${office.toUpperCase()} tomorrow`);
+      say(`At present ${attendees} would be attending ${office.toUpperCase()} tomorrow. \nThis is *${totalCount}* person(s) in total, the office is *${verdict}*.`);
     } else {
       say(
-        `No one at the moment would be attending ${office.toUpperCase()} tomorrow`,
+        `At present no one would be attending ${office.toUpperCase()} tomorrow, the office is *safe*`,
       );
     }
   } else {
@@ -253,6 +257,23 @@ function getAttendeesTomorrow(office, date) {
     result += `<@${attendee}>,`;
   });
   return result;
+}
+
+function getAttendeesTotalCount(attendeeMap, office) {
+  let count = 0;
+  const ids = Array.from(slackIds);
+  ids.forEach((id) => {
+    if (attendeeMap.get(id) === office.toLowerCase()) count += 1;
+  });
+  return count;
+}
+
+function getSafetyVerdict(count, office) {
+  let verdict = 'safe';
+  if (count > officesThreshold.get(office.toLowerCase())) {
+    verdict = 'not safe';
+  }
+  return verdict;
 }
 
 function removeAttendeeToday(userId, office, date) {

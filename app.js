@@ -23,7 +23,7 @@ const app = new App({
 
   userStore.fetchAllUsersFromWorkspace().then(() => {
     const users = userStore.getUserList();
-    // requestProvider.sendInitialRequestToAllEmployees(users);
+    requestProvider.sendInitialRequestToAllEmployees(users);
     console.log('Sent request to all employees!');
   });
 })();
@@ -31,9 +31,9 @@ const app = new App({
 
 // /setthreshold office1 12
 // /getthreshold office1
-// /whosattending office1 today,tomorrow,dd/MM/yy
-// /removeme office1 today,tomorrow,dd/MM/yy
-// /addme office today, tomorrow
+// /whosattending office1 today or tomorrow
+// /removeme office1 today or tomorrow
+// /addme office today or tomorrow
 app.command('/setthreshold', commandHandler.handleSetThresholdRequest);
 
 app.command('/getthreshold', commandHandler.handleGetThresholdRequest);
