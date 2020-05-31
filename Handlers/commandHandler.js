@@ -8,7 +8,6 @@ const officesThreshold = new Map();
 const usersAttendingToday = new Map();
 const usersAttendingTomorrow = new Map();
 
-const slackIds = new Set();
 const ada = 'ada';
 const turing = 'turing';
 const dekker = 'dekker';
@@ -48,7 +47,7 @@ const handleGetWhoIsAttendingRequest = async ({ command, ack, say }) => {
   } else if (day.toLowerCase() === 'today' && officeExists) {
     params[1] = getTodaysDate();
     await ack();
-    const attendees = getAttendeesToday(office, params[1]);
+    const attendees = getAttendees(usersAttendingToday, office, params[1]);
     const totalCount = getAttendeesTotalCount(usersAttendingToday, office);
     const verdict = getSafetyVerdict(totalCount, office);
     if (attendees) {
@@ -61,7 +60,7 @@ const handleGetWhoIsAttendingRequest = async ({ command, ack, say }) => {
   } else if (day.toLowerCase() === 'tomorrow' && officeExists) {
     params[1] = getTomorrowsDate();
     await ack();
-    const attendees = getAttendeesTomorrow(office, params[1]);
+    const attendees = getAttendees(usersAttendingTomorrow, office, params[1]);
     const totalCount = getAttendeesTotalCount(usersAttendingTomorrow, office);
     const verdict = getSafetyVerdict(totalCount, office);
     if (attendees) {
@@ -91,7 +90,7 @@ const handleRemoveMeRequest = async ({ command, ack, say }) => {
   } else if (day.toLowerCase() === 'today' && officeExists) {
     params[1] = getTodaysDate();
     await ack();
-    const removed = removeAttendeeToday(command.user_id, office, params[1]);
+    const removed = removeAttendee(usersAttendingToday, command.user_id, office, params[1]);
     if (removed) {
       say(
         `<@${
@@ -108,7 +107,7 @@ const handleRemoveMeRequest = async ({ command, ack, say }) => {
   } else if (day.toLowerCase() === 'tomorrow' && officeExists) {
     params[1] = getTomorrowsDate();
     await ack();
-    const removed = removeAttendeeTomorrow(command.user_id, office, params[1]);
+    const removed = removeAttendee(usersAttendingTomorrow, command.user_id, office, params[1]);
     if (removed) {
       say(
         `<@${
@@ -142,7 +141,7 @@ const handleAddMeRequest = async ({ command, ack, say }) => {
   } else if (day.toLowerCase() === 'today' && officeExists) {
     params[1] = getTodaysDate();
     await ack();
-    const added = addAttendeeToday(command.user_id, office, params[1]);
+    const added = addAttendee(usersAttendingToday, command.user_id, office, params[1]);
     if (added) {
       say(
         `<@${
@@ -159,7 +158,7 @@ const handleAddMeRequest = async ({ command, ack, say }) => {
   } else if (day.toLowerCase() === 'tomorrow' && officeExists) {
     params[1] = getTomorrowsDate();
     await ack();
-    const added = addAttendeeTomorrow(command.user_id, office, params[1]);
+    const added = addAttendee(usersAttendingTomorrow, command.user_id, office, params[1]);
     if (added) {
       say(
         `<@${
@@ -233,37 +232,18 @@ function getThreshold(office) {
   return result;
 }
 
-function getAttendeesToday(office, date) {
-  const ids = Array.from(slackIds);
-  const attendees = [];
+function getAttendees(attendeeMap, office, date) {
   let result = '';
-  ids.forEach((id) => {
-    if (usersAttendingToday.get(id) === office.toLowerCase()) attendees.push(id);
-  });
-  attendees.forEach((attendee) => {
-    result += `<@${attendee}>,`;
-  });
-  return result;
-}
-
-function getAttendeesTomorrow(office, date) {
-  const ids = Array.from(slackIds);
-  const attendees = [];
-  let result = '';
-  ids.forEach((id) => {
-    if (usersAttendingTomorrow.get(id) === office.toLowerCase()) attendees.push(id);
-  });
-  attendees.forEach((attendee) => {
-    result += `<@${attendee}>,`;
+  Array.from(attendeeMap.keys()).forEach((key) => {
+    if (attendeeMap.get(key) === office.toLowerCase()) result += `<@${key}>,`;
   });
   return result;
 }
 
 function getAttendeesTotalCount(attendeeMap, office) {
   let count = 0;
-  const ids = Array.from(slackIds);
-  ids.forEach((id) => {
-    if (attendeeMap.get(id) === office.toLowerCase()) count += 1;
+  Array.from(attendeeMap.keys()).forEach((key) => {
+    if (attendeeMap.get(key) === office.toLowerCase()) count += 1;
   });
   return count;
 }
@@ -276,35 +256,19 @@ function getSafetyVerdict(count, office) {
   return verdict;
 }
 
-function removeAttendeeToday(userId, office, date) {
-  if (usersAttendingToday.has(userId)) {
+function removeAttendee(attendeeMap, userId, office, date) {
+  if (attendeeMap.has(userId)) {
     console.log(`Removing ${userId} to attend ${office} on ${date}`);
-    return usersAttendingToday.delete(userId);
+    return attendeeMap.delete(userId);
   }
   return false;
 }
 
-function removeAttendeeTomorrow(userId, office, date) {
-  if (usersAttendingTomorrow.has(userId)) {
-    console.log(`Removing ${userId} to attend ${office} on ${date}`);
-    return usersAttendingTomorrow.delete(userId);
-  }
-  return false;
-}
 
-function addAttendeeToday(userId, office, date) {
-  if (!usersAttendingToday.has(userId)) {
+function addAttendee(attendeeMap, userId, office, date) {
+  if (!attendeeMap.has(userId)) {
     console.log(`Adding ${userId} to attend ${office} on ${date}`);
-    slackIds.add(userId);
-    return usersAttendingToday.set(userId, office.toLowerCase());
-  }
-  return false;
-}
-function addAttendeeTomorrow(userId, office, date) {
-  if (!usersAttendingTomorrow.has(userId)) {
-    console.log(`Adding ${userId} to attend ${office} on ${date}`);
-    slackIds.add(userId);
-    return usersAttendingTomorrow.set(userId, office.toLowerCase());
+    return attendeeMap.set(userId, office.toLowerCase());
   }
   return false;
 }
